@@ -13,44 +13,53 @@ people = []
 class MyFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.next_row = 1
 
     def add_person(self, person):
-        def show_description():
+        def show_description(person):
             win = ctk.CTkToplevel(self)
-            win.title("Description")
-            label = ctk.CTkLabel(win, text=person["desc"], width=300, height=100)
+            win.title(f"Details for {person['name']}")
+            details = [
+                f"Name: {person['name']}",
+                f"Description: {person['desc']}",
+                f"Available: {person['available']}",
+                f"Lvl 10%: {person['lvl10']}",
+                f"Min Buff: {person['min_buff']}",
+                f"Max Buff: {person['max_buff']}"
+            ]
+            label = ctk.CTkLabel(win, text="\n".join(details), width=300, height=200)
             label.pack(padx=10, pady=10)
 
-        item_button = ctk.CTkButton(self, text=person["name"], command=show_description)
+        item_button = ctk.CTkButton(self, text=person["name"], command=lambda: show_description(person))
         item_button.grid(row=self.next_row, column=0, sticky="w", padx=20)
         self.next_row += 1
 
     def list_data_ctk(self):
         # Headers
-        headers = ["Id", "Name", "Description", "available", "lvl10%", "min buff", "max buff"]
-        widths = [5, 20, 60, 20, 20, 20, 40, 40, 40] # = 265
+        headers = ["Id", "Name", "Description", "Available", "Lvl 10%", "Min Buff", "Max Buff"]
+        widths = [5, 20, 60, 20, 20, 20, 40]  # Adjusted for column width
 
+        # Create headers
         for col, text in enumerate(headers):
             lbl = ctk.CTkLabel(self, text=text, anchor="w")
             lbl.grid(row=0, column=col, sticky="w", padx=3, pady=2)
             self.grid_columnconfigure(col, minsize=widths[col] * 6)
 
-        # Rows
+        # Display rows
         for row, item in enumerate(people, start=1):
-            name_display = item["name"][:12] + "..." if len(item["name"]) > 15 else item["name"]
-            desc_display = item["desc"][:42] + "..." if len(item["desc"]) > 45 else item["desc"]
-            available_display = item["available"][:7] + "..." if len(item["available"]) > 10 else item["available"]
-            lvl10_display = item["lvl10"][:7] + "..." if len(item["lvl10"]) > 10 else item["lvl10"]
-            min_buff_display = item["min_buff"][:7] + "..." if len(item["min_buff"]) > 10 else item["min_buff"]
-            max_buff_display = item["max_buff"][:7] + "..." if len(item["max_buff"]) > 10 else item["max_buff"]
+            # Display the data with truncation if too long
+            display_values = [
+                f"{row:>2}",
+                item["name"][:12] + "..." if len(item["name"]) > 15 else item["name"],
+                item["desc"][:42] + "..." if len(item["desc"]) > 45 else item["desc"],
+                item["available"][:7] + "..." if len(item["available"]) > 10 else item["available"],
+                item["lvl10"][:7] + "..." if len(item["lvl10"]) > 10 else item["lvl10"],
+                item["min_buff"][:7] + "..." if len(item["min_buff"]) > 10 else item["min_buff"],
+                item["max_buff"][:7] + "..." if len(item["max_buff"]) > 10 else item["max_buff"]
+            ]
 
-            ctk.CTkLabel(self, text=f"{row:>2}", anchor="w").grid(row=row, column=0, sticky="w", padx=3, pady=1)
-            ctk.CTkLabel(self, text=name_display, anchor="w").grid(row=row, column=1, sticky="w", padx=3, pady=1)
-            ctk.CTkLabel(self, text=desc_display, anchor="w").grid(row=row, column=2, sticky="w", padx=3, pady=1)
-            ctk.CTkLabel(self, text=available_display, anchor="w").grid(row=row, column=3, sticky="w", padx=3, pady=1)
-            ctk.CTkLabel(self, text=lvl10_display, anchor="w").grid(row=row, column=4, sticky="w", padx=3, pady=1)
-            ctk.CTkLabel(self, text=min_buff_display, anchor="w").grid(row=row, column=5, sticky="w", padx=3, pady=1)
-            ctk.CTkLabel(self, text=max_buff_display, anchor="w").grid(row=row, column=6, sticky="w", padx=3, pady=1)
+            for col, value in enumerate(display_values):
+                ctk.CTkLabel(self, text=value, anchor="w").grid(row=row, column=col, sticky="w", padx=3, pady=1)
 
 # -------------------------------------
 # CTK
@@ -76,13 +85,13 @@ class App(ctk.CTk):
         self.available_ent = ctk.CTkEntry(self, placeholder_text="Available")
         self.available_ent.grid(row=1, column=2, sticky="nsew")
 
-        self.lvl_entry = ctk.CTkEntry(self, placeholder_text="lvl 10")
+        self.lvl_entry = ctk.CTkEntry(self, placeholder_text="Lvl 10")
         self.lvl_entry.grid(row=1, column=3, sticky="nsew")
 
-        self.minimum_buff_entry = ctk.CTkEntry(self, placeholder_text="min buff lvl")
+        self.minimum_buff_entry = ctk.CTkEntry(self, placeholder_text="Min Buff Lvl")
         self.minimum_buff_entry.grid(row=1, column=4, sticky="nsew")
 
-        self.max_buff_entry = ctk.CTkEntry(self, placeholder_text="max buff lvl")
+        self.max_buff_entry = ctk.CTkEntry(self, placeholder_text="Max Buff Lvl")
         self.max_buff_entry.grid(row=1, column=5, sticky="nsew")
 
         button = ctk.CTkButton(self, text="Add Person", command=self.add_person)
@@ -97,7 +106,14 @@ class App(ctk.CTk):
         min_buff = self.minimum_buff_entry.get()
         max_buff = self.max_buff_entry.get()
 
-        person = {"name": name, "desc": desc, "available": available, "lvl10": lvl10, "min_buff": min_buff, "max_buff": max_buff}
+        person = {
+            "name": name,
+            "desc": desc,
+            "available": available,
+            "lvl10": lvl10,
+            "min_buff": min_buff,
+            "max_buff": max_buff
+        }
         people.append(person)
 
         # Clear input fields after adding
@@ -116,6 +132,6 @@ class App(ctk.CTk):
 
 app = App()
 app.minsize(800, 400)
-app.title("EventManagment")
+app.title("Event Management")
 
 app.mainloop()
