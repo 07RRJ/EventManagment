@@ -115,11 +115,6 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
         app.set_editing(True, person_index)
 
     def add_person(self, person, person_index=None): # add to the list
-        row_frame = ctk.CTkFrame(self)
-        row_frame.grid(row=self.next_row, column=0, columnspan=7, sticky="w", padx=10, pady=2)
-
-        col_widths = [5, 20, 60, 20, 20, 20, 40]
-
         display_values = [
             f"{self.next_row:>2}",
             person["name"][:12] + "..." if len(person["name"]) > 15 else person["name"],
@@ -131,17 +126,10 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
         ]
 
         for col, value in enumerate(display_values):
-            label = ctk.CTkLabel(row_frame, text=value, anchor="w", width=col_widths[col]*6)
-            label.grid(row=0, column=col, sticky="w")
-            # bind click to each label
-            label.bind(
-                "<Button-1>",
-                lambda event, p=person, idx=person_index: self.show_edit_window(p, idx)
-            )
-
-        for i, w in enumerate(col_widths):
-            row_frame.grid_columnconfigure(i, minsize=w*6)
-
+            label = ctk.CTkLabel(self, text=value, anchor="w")
+            label.grid(row=self.next_row, column=col, sticky="w", padx=3, pady=2)
+            label.bind("<Button-1>",
+                    lambda event, p=person, idx=person_index: self.show_edit_window(p, idx))
         self.next_row += 1
 
     def list_data_ctk(self): # dissplay current data
