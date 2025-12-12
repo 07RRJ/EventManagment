@@ -20,7 +20,7 @@ def load_data(filename):
             
             products.append(
                 {
-                    "id": id_,
+                    "id": int(id_),
                     "name": name,
                     "desc": desc,
                     "available": available,
@@ -226,8 +226,14 @@ class App(ctk.CTk):
         min_buff = self.minimum_buff_entry.get()
         max_buff = self.max_buff_entry.get()
 
+        if people:
+            new_id = max(p["id"] for p in people) + 1
+        else:
+            new_id = 1
+
         # shove it in a dictionary
         person = {
+            "id": new_id,
             "name": name,
             "desc": desc,
             "available": available,
@@ -244,6 +250,8 @@ class App(ctk.CTk):
         self.lvl_entry.delete(0, ctk.END)
         self.minimum_buff_entry.delete(0, ctk.END)
         self.max_buff_entry.delete(0, ctk.END)
+
+        self.my_frame.list_data_ctk()
 
 # -------------------------------------
 # PROGRAM
