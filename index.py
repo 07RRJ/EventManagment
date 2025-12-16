@@ -191,6 +191,9 @@ class App(ctk.CTk):
         button = ctk.CTkButton(self, text="Add Person", command=self.add_person)
         button.grid(row=1, column=6, sticky="nsew")
 
+        self.save_button = ctk.CTkButton(self, text="Save to CSV", command=self.save_to_csv)
+        self.save_button.grid(row=1, column=7, sticky="nsew")
+
         self.is_editing = False
         self.editing_person_index = None
 
@@ -252,6 +255,13 @@ class App(ctk.CTk):
         self.max_buff_entry.delete(0, ctk.END)
 
         self.my_frame.list_data_ctk()
+
+    def save_to_csv(self):
+        fieldnames = ["id", "name", "desc", "available", "lvl10", "min_buff", "max_buff"]
+        with open(FileName, "w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(people)
 
 # -------------------------------------
 # PROGRAM
