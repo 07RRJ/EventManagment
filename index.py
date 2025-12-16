@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from tkinter import messagebox
 import csv
 
 # -------------------------------------
@@ -181,6 +182,10 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
         for row, item in enumerate(people, start=1):
             self.add_person(item, person_index=row - 1)
 
+        current_width = self.master.winfo_width()
+        if current_width > 0:  # valid width
+            self.update_column_widths(current_width)
+
 # -------------------------------------
 # CTK
 # -------------------------------------
@@ -230,6 +235,8 @@ class App(ctk.CTk):
         self.editing_person_index = None
 
         self.my_frame.list_data_ctk()
+
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def on_resize(self, event): # check if need to resize
         new_size = (self.winfo_width(), self.winfo_height())
@@ -294,6 +301,11 @@ class App(ctk.CTk):
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(people)
+
+    def on_close(self):
+        if messagebox.askquestion("Save", "Save before exit?") == "yes":
+            self.save_to_csv()
+        self.destroy()
 
 # -------------------------------------
 # PROGRAM
