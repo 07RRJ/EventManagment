@@ -110,6 +110,8 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
             win.grid_columnconfigure(i, weight=1)
 
         def save_changes(): # if save change the og list
+            if not messagebox.askyesno("Confirm Save", f"Are you sure you want to save changes to {person['name']}?"):
+                return
             person['name'] = name_entry.get()
             person['desc'] = desc_entry.get()
             person['available'] = available_entry.get()
@@ -123,6 +125,8 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
             win.destroy()
 
         def delete_person(): # remove from list
+            if not messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete {person['name']}?"):
+                return
             del people[person_index]
             app.my_frame.list_data_ctk()
             app.set_editing(False)
@@ -249,6 +253,11 @@ class App(ctk.CTk):
         self._resize_timer = self.after(250, self._handle_resize)
 
     def _handle_resize(self): # resize
+        new_width = self.winfo_width()
+
+        if abs(new_width - getattr(self, "_last_resize_width", 0)) < 30:
+            return  # ignore tiny resizes
+
         new_width = self.winfo_width()
         self.my_frame.update_column_widths(new_width)
 
