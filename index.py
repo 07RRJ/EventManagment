@@ -159,7 +159,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.grid_rowconfigure(0, weight=1)
-        for i in range(8):
+        for i in range(4):
             self.grid_columnconfigure(i, weight=1)
 
         self.my_frame = MyFrame(master=self, width=1000, height=6)
@@ -170,6 +170,7 @@ class App(ctk.CTk):
         self._last_size = (self.winfo_width(), self.winfo_height())
         
         # entry fields to add new person v
+        # ------ row 1 ------
         self.name_ent = ctk.CTkEntry(self, placeholder_text="Name")
         self.name_ent.grid(row=1, column=0, sticky="nsew")
 
@@ -179,20 +180,21 @@ class App(ctk.CTk):
         self.available_ent = ctk.CTkEntry(self, placeholder_text="Available")
         self.available_ent.grid(row=1, column=2, sticky="nsew")
 
+        button = ctk.CTkButton(self, text="Add Person", command=self.add_person)
+        button.grid(row=1, column=3, sticky="nsew")
+
+        # ------ row 2 ------
         self.lvl_entry = ctk.CTkEntry(self, placeholder_text="Lvl 10")
-        self.lvl_entry.grid(row=1, column=3, sticky="nsew")
+        self.lvl_entry.grid(row=2, column=0, sticky="nsew")
 
         self.minimum_buff_entry = ctk.CTkEntry(self, placeholder_text="Min Buff Lvl")
-        self.minimum_buff_entry.grid(row=1, column=4, sticky="nsew")
+        self.minimum_buff_entry.grid(row=2, column=1, sticky="nsew")
 
         self.max_buff_entry = ctk.CTkEntry(self, placeholder_text="Max Buff Lvl")
-        self.max_buff_entry.grid(row=1, column=5, sticky="nsew")
-
-        button = ctk.CTkButton(self, text="Add Person", command=self.add_person)
-        button.grid(row=1, column=6, sticky="nsew")
+        self.max_buff_entry.grid(row=2, column=2, sticky="nsew")
 
         self.save_button = ctk.CTkButton(self, text="Save to CSV", command=self.save_to_csv)
-        self.save_button.grid(row=1, column=7, sticky="nsew")
+        self.save_button.grid(row=2, column=3, sticky="nsew")
 
         self.is_editing = False
         self.editing_person_index = None
