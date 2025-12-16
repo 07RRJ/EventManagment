@@ -44,6 +44,15 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
         self.next_row = 1
         self.current_total_width = master.winfo_width()
 
+    def make_row_hoverable(self, frame):
+        def on_enter(e):
+            frame.configure(fg_color=("gray80", "gray25"))
+        def on_leave(e):
+            frame.configure(fg_color=("gray90", "gray15"))
+
+        frame.bind("<Enter>", on_enter)
+        frame.bind("<Leave>", on_leave)
+
     def update_column_widths(self, total_width):
         proportions = [0.05, 0.15, 0.35, 0.1, 0.1, 0.1, 0.15]
         widths = [int(total_width * p) for p in proportions]
@@ -114,7 +123,10 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
 
         app.set_editing(True, person_index)
 
-    def add_person(self, person, person_index=None): # add to the list
+    def add_person(self, person, person_index=None):
+        row_frame = ctk.CTkFrame(self)
+        row_frame.grid(row=self.next_row, column=0, columnspan=7, sticky="nsew", padx=0, pady=1)
+
         display_values = [
             f"{self.next_row:>2}",
             person["name"][:12] + "..." if len(person["name"]) > 15 else person["name"],
@@ -122,14 +134,20 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
             person["available"][:7] + "..." if len(person["available"]) > 10 else person["available"],
             person["lvl10"][:7] + "..." if len(person["lvl10"]) > 10 else person["lvl10"],
             person["min_buff"][:7] + "..." if len(person["min_buff"]) > 10 else person["min_buff"],
-            person["max_buff"][:7] + "..." if len(person["max_buff"]) > 10 else person["max_buff"]
+            person["max_buff"][:7] + "..." if len(person["max_buff"]) > 10 else person["max_buff"],
         ]
 
         for col, value in enumerate(display_values):
-            label = ctk.CTkLabel(self, text=value, anchor="w")
-            label.grid(row=self.next_row, column=col, sticky="w", padx=3, pady=2)
-            label.bind("<Button-1>",
-                    lambda event, p=person, idx=person_index: self.show_edit_window(p, idx))
+            label = ctk.CTkLabel(row_frame, text=value, anchor="w")
+            label.grid(row=0, column=col, sticky="w", padx=3, pady=2)
+
+        # make the whole frame clickable.... ugh.... det funkar.... yay
+        row_frame.bind("<Button-1>", lambda e, p=person, idx=person_index: self.show_edit_window(p, idx))
+        for child in row_frame.winfo_children():
+            child.bind("<Button-1>", lambda e, p=person, idx=person_index: self.show_edit_window(p, idx))
+
+        self.make_row_hoverable(row_frame)
+
         self.next_row += 1
 
     def list_data_ctk(self): # dissplay current data
