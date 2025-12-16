@@ -65,8 +65,20 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
                     child.grid_columnconfigure(col, minsize=width)
 
     def show_edit_window(self, person, person_index): # when person clicked on show this
+        if app.is_editing:
+            return
+
         win = ctk.CTkToplevel(self)
         win.title(f"Edit Details for {person['name']}")
+        win.minsize(300, 350)
+
+        win.grab_set()
+        win.focus_set()
+
+        def on_close():
+            app.set_editing(False)
+            win.destroy()
+        win.protocol("WM_DELETE_WINDOW", on_close)
 
         # edit data v
         name_entry = ctk.CTkEntry(win, placeholder_text="Name")
@@ -105,15 +117,15 @@ class MyFrame(ctk.CTkScrollableFrame): # the list
             person['max_buff'] = max_buff_entry.get()
 
             people[person_index] = person
-            win.destroy()
             app.my_frame.list_data_ctk()
             app.set_editing(False)
+            win.destroy()
 
         def delete_person(): # remove from list
             del people[person_index]
-            win.destroy()
             app.my_frame.list_data_ctk()
             app.set_editing(False)
+            win.destroy()
 
         save_button = ctk.CTkButton(win, text="Save Changes", command=save_changes)
         save_button.grid(row=6, column=0, padx=20, pady=10, sticky="ew")
